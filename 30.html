@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>喵喵 vs 汪汪 - 30秒可愛連點大作戰 🐾</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for cute icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts for cute rounded feel -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Mochiyom Pop P One&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti library for win celebration -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        cute: ['"Mochiyom Pop P One"', '"Fredoka"', 'sans-serif'],
+                        rounded: ['"Fredoka"', 'sans-serif'],
+                    },
+                    colors: {
+                        pastelPink: '#FFD1DC',
+                        pastelPurple: '#E8D5FF',
+                        pastelYellow: '#FFF5BA',
+                        pastelBlue: '#BAE6FF',
+                        pastelGreen: '#C1F0C1',
+                        cuteRose: '#FF85A1',
+                        cutePurple: '#B185DB',
+                        cuteYellow: '#FFD000',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Fredoka', 'Mochiyom Pop P One', cursive, sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+            background: linear-gradient(135deg, #FFE5EC 0%, #F0E6FF 50%, #E8F0FE 100%);
+        }
+
+        /* Cute floating background items */
+        .bg-bubble {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.4;
+            animation: float 8s infinite ease-in-out;
+            pointer-events: none;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-25px) rotate(15deg); }
+        }
+
+        /* Pressable Paw Button styling */
+        .cute-btn-shadow {
+            box-shadow: 0 12px 0 #FF6B8B, 0 18px 25px rgba(255, 107, 139, 0.4);
+            transition: all 0.08s ease;
+        }
+
+        .cute-btn-shadow:active {
+            transform: translateY(8px);
+            box-shadow: 0 4px 0 #FF6B8B, 0 8px 12px rgba(255, 107, 139, 0.3);
+        }
+
+        /* Floating +1 Pop particles */
+        @keyframes pop-float {
+            0% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(0.8) rotate(-10deg);
+            }
+            50% {
+                transform: translate(-50%, -100px) scale(1.3) rotate(10deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -150px) scale(1.5) rotate(0deg);
+            }
+        }
+
+        .click-pop-particle {
+            position: absolute;
+            pointer-events: none;
+            animation: pop-float 0.75s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            font-family: 'Mochiyom Pop P One', cursive;
+            z-index: 40;
+            text-shadow: 2px 2px 0px #fff, -2px -2px 0px #fff, 2px -2px 0px #fff, -2px 2px 0px #fff;
+        }
+
+        /* Pulse animation for timer */
+        @keyframes pulse-heart {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.12); }
+        }
+
+        .pulse-heart {
+            animation: pulse-heart 1s infinite ease-in-out;
+        }
+
+        /* Custom scrollbar reset */
+        ::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col justify-between items-center p-3 sm:p-5 text-slate-700 relative overflow-hidden">
+
+    <!-- Cute Floating Background Decorations -->
+    <div class="bg-bubble w-20 h-20 bg-pink-300 top-10 left-6 text-2xl flex items-center justify-center" style="animation-delay: 0s;">🌸</div>
+    <div class="bg-bubble w-16 h-16 bg-purple-300 bottom-16 left-10 text-xl flex items-center justify-center" style="animation-delay: 2s;">⭐</div>
+    <div class="bg-bubble w-24 h-24 bg-yellow-200 top-20 right-8 text-3xl flex items-center justify-center" style="animation-delay: 4s;">💖</div>
+    <div class="bg-bubble w-14 h-14 bg-blue-200 bottom-24 right-12 text-lg flex items-center justify-center" style="animation-delay: 1s;">✨</div>
+
+    <!-- Header Banner -->
+    <header class="w-full max-w-md text-center pt-2 relative z-10">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 bg-white/80 backdrop-blur-md rounded-full shadow-sm border-2 border-pink-200 text-pink-500 font-bold text-sm mb-1">
+            <i class="fa-solid fa-cat text-pink-400"></i> 連點大作戰 🐾
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-black text-slate-800 tracking-wide font-cute drop-shadow-sm flex items-center justify-center gap-2">
+            <span>喵喵小手</span>
+            <span class="text-xs bg-pink-500 text-white px-2 py-0.5 rounded-full font-sans">VS</span>
+            <span>汪汪 AI</span>
+        </h1>
+        <p class="text-xs text-slate-500 font-bold mt-0.5">30秒極速比拚！你能贏過每秒約5下的 AI 嗎？</p>
+    </header>
+
+    <!-- Main Game Container -->
+    <main class="w-full max-w-md my-auto flex flex-col items-center gap-4 relative z-10">
+
+        <!-- Top Dashboard: Stats & Countdown -->
+        <div class="w-full bg-white/90 backdrop-blur-md rounded-3xl p-4 shadow-xl border-4 border-pink-200 grid grid-cols-3 gap-2 text-center relative overflow-hidden">
+            
+            <!-- Player Stats -->
+            <div class="flex flex-col items-center justify-center p-2 rounded-2xl bg-pink-50 border-2 border-pink-200">
+                <div class="flex items-center gap-1 text-xs font-black text-pink-500">
+                    <span class="text-base">🐱</span> 你 (喵喵)
+                </div>
+                <div id="playerCps" class="text-lg sm:text-xl font-black text-pink-600 mt-1">0.0 <span class="text-xs">CPS</span></div>
+                <div class="text-xs font-bold text-slate-400">連點: <span id="playerClicksText" class="text-pink-600 font-black text-sm">0</span></div>
+            </div>
+
+            <!-- Main Timer -->
+            <div class="flex flex-col items-center justify-center p-2 rounded-2xl bg-amber-50 border-2 border-amber-200 relative">
+                <div class="text-[10px] font-black text-amber-500 uppercase tracking-wider flex items-center gap-1">
+                    <i class="fa-solid fa-stopwatch text-amber-400"></i> 剩餘時間
+                </div>
+                <div id="timer" class="text-2xl sm:text-3xl font-black text-amber-500 font-cute my-0.5 tracking-tight">30.0s</div>
+                <div class="w-full bg-amber-200 h-2 rounded-full overflow-hidden p-0.5">
+                    <div id="timerBar" class="bg-amber-400 h-full rounded-full transition-all duration-100" style="width: 100%;"></div>
+                </div>
+            </div>
+
+            <!-- AI Stats -->
+            <div class="flex flex-col items-center justify-center p-2 rounded-2xl bg-purple-50 border-2 border-purple-200">
+                <div class="flex items-center gap-1 text-xs font-black text-purple-500">
+                    <span class="text-base">🐶</span> 汪汪 AI
+                </div>
+                <div id="aiCps" class="text-lg sm:text-xl font-black text-purple-600 mt-1">0.0 <span class="text-xs">CPS</span></div>
+                <div class="text-xs font-bold text-slate-400">連點: <span id="aiClicksText" class="text-purple-600 font-black text-sm">0</span></div>
+            </div>
+        </div>
+
+        <!-- Real-Time Race Track Progress Bar -->
+        <div class="w-full bg-white/90 backdrop-blur-md rounded-3xl p-4 shadow-xl border-4 border-purple-200 space-y-3">
+            
+            <!-- Player Race Bar -->
+            <div>
+                <div class="flex justify-between items-center text-xs font-black text-pink-500 mb-1">
+                    <span class="flex items-center gap-1">🐱 喵喵戰力</span>
+                    <span id="playerPercent" class="font-bold text-pink-400">0%</span>
+                </div>
+                <div class="w-full h-5 bg-pink-100 rounded-full p-1 border-2 border-pink-200 relative overflow-hidden flex items-center">
+                    <div id="playerBar" class="h-full bg-gradient-to-r from-pink-300 to-pink-500 rounded-full transition-all duration-150" style="width: 0%"></div>
+                    <!-- Cute Runner Avatar inside track -->
+                    <span id="playerAvatar" class="absolute text-sm transition-all duration-150" style="left: 0%;">🐱</span>
+                </div>
+            </div>
+
+            <!-- Race Separator -->
+            <div class="flex justify-center items-center gap-2">
+                <div class="h-0.5 bg-purple-100 flex-1"></div>
+                <span class="text-xs font-black text-purple-300 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200">賽況 PK</span>
+                <div class="h-0.5 bg-purple-100 flex-1"></div>
+            </div>
+
+            <!-- AI Race Bar -->
+            <div>
+                <div class="flex justify-between items-center text-xs font-black text-purple-500 mb-1">
+                    <span class="flex items-center gap-1">🐶 汪汪 AI (約 5 CPS)</span>
+                    <span id="aiPercent" class="font-bold text-purple-400">0%</span>
+                </div>
+                <div class="w-full h-5 bg-purple-100 rounded-full p-1 border-2 border-purple-200 relative overflow-hidden flex items-center">
+                    <div id="aiBar" class="h-full bg-gradient-to-r from-purple-300 to-purple-500 rounded-full transition-all duration-150" style="width: 0%"></div>
+                    <span id="aiAvatar" class="absolute text-sm transition-all duration-150" style="left: 0%;">🐶</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Giant Pressable Cute Paw Button -->
+        <div id="clickArea" class="relative w-full flex justify-center items-center py-2">
+            <button id="clickBtn" disabled
+                class="w-48 h-48 sm:w-56 sm:h-56 rounded-full bg-gradient-to-b from-pink-300 via-pink-400 to-rose-400 border-8 border-white text-white font-cute text-2xl flex flex-col justify-center items-center gap-2 cute-btn-shadow cursor-pointer select-none disabled:opacity-60 disabled:cursor-not-allowed">
+                <!-- Paw Icon SVG / Graphic -->
+                <div class="relative flex flex-col items-center pointer-events-none">
+                    <div class="text-5xl sm:text-6xl text-white drop-shadow-md">🐾</div>
+                    <span class="text-xl sm:text-2xl font-black tracking-wider text-white drop-shadow">用力瘋狂點！</span>
+                    <span class="text-xs font-bold bg-white/30 backdrop-blur-sm px-3 py-1 rounded-full text-white mt-1">喵喵肉墊按鈕</span>
+                </div>
+            </button>
+        </div>
+
+        <!-- Start Game Button -->
+        <div class="w-full flex justify-center">
+            <button id="startBtn" onclick="startGame()"
+                class="w-full py-4 bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-500 hover:from-emerald-300 hover:to-teal-400 text-white font-black text-xl rounded-2xl shadow-lg border-4 border-white transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+                <i class="fa-solid fa-play"></i> 開啟 30秒連點大作戰！
+            </button>
+        </div>
+
+    </main>
+
+    <!-- Modal for Result Screen -->
+    <div id="resultModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex justify-center items-center p-4 z-50 hidden opacity-0 transition-opacity duration-300">
+        <div id="modalCard" class="bg-white border-4 border-pink-300 rounded-3xl p-6 max-w-sm w-full text-center shadow-2xl transform scale-90 transition-transform duration-300 relative overflow-hidden">
+            
+            <!-- Result Animal Header -->
+            <div id="resultIconBox" class="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-3 text-5xl bg-pink-100 border-4 border-pink-300 shadow-inner">
+                🐱
+            </div>
+
+            <h2 id="resultTitle" class="text-2xl sm:text-3xl font-black text-pink-500 font-cute mb-1">你贏了！喵喵獲勝！</h2>
+            <p id="resultDiffText" class="text-sm font-bold text-slate-600 mb-3">領先汪汪 AI 25 下肉墊點擊！</p>
+
+            <!-- Rank Badge Tag -->
+            <div class="inline-block bg-gradient-to-r from-amber-300 to-yellow-400 text-amber-900 font-black text-sm px-4 py-1.5 rounded-full shadow-sm mb-4 border-2 border-amber-200">
+                <i class="fa-solid fa-award"></i> 稱號：<span id="rankBadge">神速連點大師</span>
+            </div>
+
+            <!-- Stats Box -->
+            <div class="bg-pink-50/80 rounded-2xl p-3 border-2 border-pink-100 space-y-2 text-xs font-bold text-slate-600 mb-5">
+                <div class="flex justify-between items-center border-b border-pink-100 pb-1.5">
+                    <span>🐱 你的總點擊數:</span>
+                    <span id="finalPlayerClicks" class="text-base font-black text-pink-600">0 下</span>
+                </div>
+                <div class="flex justify-between items-center border-b border-pink-100 pb-1.5">
+                    <span>🐶 汪汪 AI 點擊數:</span>
+                    <span id="finalAiClicks" class="text-base font-black text-purple-600">0 下</span>
+                </div>
+                <div class="flex justify-between items-center border-b border-pink-100 pb-1.5">
+                    <span>⚡ 你的平均連點速度:</span>
+                    <span id="finalPlayerCps" class="text-sm font-black text-slate-700">0.0 CPS</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span>🤖 AI 平均連點速度:</span>
+                    <span id="finalAiCps" class="text-sm font-black text-slate-700">0.0 CPS</span>
+                </div>
+            </div>
+
+            <!-- Play Again Button -->
+            <button onclick="closeModalAndReset()"
+                class="w-full py-3.5 bg-gradient-to-r from-pink-400 to-rose-400 hover:from-pink-300 hover:to-rose-300 text-white font-black text-lg rounded-2xl shadow-md border-2 border-white transition duration-200 active:scale-95 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-rotate-right"></i> 再玩一次！
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-xs font-bold text-slate-400 text-center pb-1 relative z-10">
+        30-Second Rapid Clicker Game &bull; 可愛連點大作戰 🐾
+    </footer>
+
+    <!-- Game Logic & Web Audio API -->
+    <script>
+        // Game Settings
+        const GAME_DURATION = 30.0;
+        
+        let gameState = 'IDLE'; // 'IDLE', 'RUNNING', 'FINISHED'
+        let playerClicks = 0;
+        let aiClicks = 0;
+        let timeRemaining = GAME_DURATION;
+        
+        let gameInterval = null;
+        let aiTimeout = null;
+        let startTime = 0;
+
+        // Cute Web Audio API Sound System
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        // Cute pitch pop audio generator
+        function playCutePopSound() {
+            if (!audioCtx) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                
+                // Cute random high pitched popping notes
+                const freqs = [523.25, 659.25, 783.99, 1046.50, 1174.66]; // C5, E5, G5, C6, D6
+                const randomFreq = freqs[Math.floor(Math.random() * freqs.length)];
+                
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(randomFreq, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(randomFreq * 1.5, audioCtx.currentTime + 0.06);
+
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.06);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.06);
+            } catch (e) {}
+        }
+
+        // Fanfare Win Sound Effect
+        function playVictorySound() {
+            if (!audioCtx) return;
+            const notes = [523.25, 659.25, 783.99, 1046.50];
+            notes.forEach((freq, i) => {
+                setTimeout(() => {
+                    try {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.start();
+                        osc.stop(audioCtx.currentTime + 0.25);
+                    } catch(e){}
+                }, i * 100);
+            });
+        }
+
+        // DOM Elements
+        const clickBtn = document.getElementById('clickBtn');
+        const startBtn = document.getElementById('startBtn');
+        const timerEl = document.getElementById('timer');
+        const timerBar = document.getElementById('timerBar');
+        const playerClicksText = document.getElementById('playerClicksText');
+        const aiClicksText = document.getElementById('aiClicksText');
+        const playerCpsEl = document.getElementById('playerCps');
+        const aiCpsEl = document.getElementById('aiCps');
+
+        const playerBar = document.getElementById('playerBar');
+        const aiBar = document.getElementById('aiBar');
+        const playerPercent = document.getElementById('playerPercent');
+        const aiPercent = document.getElementById('aiPercent');
+        const playerAvatar = document.getElementById('playerAvatar');
+        const aiAvatar = document.getElementById('aiAvatar');
+        const clickArea = document.getElementById('clickArea');
+
+        // Modal Elements
+        const resultModal = document.getElementById('resultModal');
+        const modalCard = document.getElementById('modalCard');
+        const resultTitle = document.getElementById('resultTitle');
+        const resultDiffText = document.getElementById('resultDiffText');
+        const resultIconBox = document.getElementById('resultIconBox');
+        const rankBadge = document.getElementById('rankBadge');
+        const finalPlayerClicks = document.getElementById('finalPlayerClicks');
+        const finalAiClicks = document.getElementById('finalAiClicks');
+        const finalPlayerCps = document.getElementById('finalPlayerCps');
+        const finalAiCps = document.getElementById('finalAiCps');
+
+        // Click Event Listeners
+        clickBtn.addEventListener('pointerdown', (e) => {
+            if (gameState !== 'RUNNING') return;
+            e.preventDefault();
+            
+            initAudio();
+            playCutePopSound();
+
+            playerClicks++;
+            updateUI();
+
+            // Create pop effects (Hearts, Stars, +1)
+            createPopParticle(e);
+        });
+
+        // Spawn cute pop particle
+        function createPopParticle(e) {
+            const particle = document.createElement('div');
+            particle.className = 'click-pop-particle font-cute font-black text-pink-500 text-xl';
+            
+            // Random cute emoji or +1
+            const icons = ['+1', '💖', '🐾', '✨', '🌸', '⭐', '+1'];
+            particle.innerText = icons[Math.floor(Math.random() * icons.length)];
+
+            const rect = clickBtn.getBoundingClientRect();
+            let x = rect.width / 2;
+            let y = rect.height / 2;
+
+            if (e && e.clientX) {
+                x = e.clientX - rect.left;
+                y = e.clientY - rect.top;
+            }
+
+            particle.style.left = `${x}px`;
+            particle.style.top = `${y}px`;
+
+            clickBtn.appendChild(particle);
+
+            setTimeout(() => particle.remove(), 750);
+        }
+
+        // Start Game
+        function startGame() {
+            if (gameState === 'RUNNING') return;
+
+            initAudio();
+
+            playerClicks = 0;
+            aiClicks = 0;
+            timeRemaining = GAME_DURATION;
+            gameState = 'RUNNING';
+
+            startBtn.disabled = true;
+            startBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            clickBtn.disabled = false;
+
+            startTime = Date.now();
+            updateUI();
+
+            // Game Countdown Loop
+            gameInterval = setInterval(() => {
+                const elapsed = (Date.now() - startTime) / 1000;
+                timeRemaining = Math.max(0, GAME_DURATION - elapsed);
+
+                timerEl.innerText = `${timeRemaining.toFixed(1)}s`;
+                const timerPct = (timeRemaining / GAME_DURATION) * 100;
+                timerBar.style.width = `${timerPct}%`;
+
+                updateUI();
+
+                if (timeRemaining <= 0) {
+                    endGame();
+                }
+            }, 50);
+
+            // AI Clicking Simulation (~5 CPS natural variance)
+            scheduleAiClick();
+        }
+
+        function scheduleAiClick() {
+            if (gameState !== 'RUNNING') return;
+
+            // Average ~200ms per click = 5 CPS. Variation between 160ms and 240ms (~4.1 - 6.2 CPS)
+            const interval = 200 + (Math.random() * 80 - 40);
+
+            aiTimeout = setTimeout(() => {
+                if (gameState === 'RUNNING') {
+                    aiClicks++;
+                    updateUI();
+                    scheduleAiClick();
+                }
+            }, interval);
+        }
+
+        // Real-time UI updates
+        function updateUI() {
+            playerClicksText.innerText = playerClicks;
+            aiClicksText.innerText = aiClicks;
+
+            const elapsedTime = Math.max(0.1, GAME_DURATION - timeRemaining);
+            const playerCPS = (playerClicks / elapsedTime).toFixed(1);
+            const aiCPS = (aiClicks / elapsedTime).toFixed(1);
+
+            playerCpsEl.innerHTML = `${playerCPS} <span class="text-xs font-bold">CPS</span>`;
+            aiCpsEl.innerHTML = `${aiCPS} <span class="text-xs font-bold">CPS</span>`;
+
+            // Max scale for track bars
+            const maxTrack = Math.max(playerClicks, aiClicks, 10);
+            const playerPct = Math.min(100, (playerClicks / maxTrack) * 100);
+            const aiPct = Math.min(100, (aiClicks / maxTrack) * 100);
+
+            playerBar.style.width = `${playerPct}%`;
+            aiBar.style.width = `${aiPct}%`;
+
+            playerPercent.innerText = `${Math.round(playerPct)}%`;
+            aiPercent.innerText = `${Math.round(aiPct)}%`;
+
+            // Position avatars along the race track
+            playerAvatar.style.left = `calc(${Math.min(92, playerPct)}%)`;
+            aiAvatar.style.left = `calc(${Math.min(92, aiPct)}%)`;
+        }
+
+        // End Game Logic
+        function endGame() {
+            gameState = 'FINISHED';
+
+            clearInterval(gameInterval);
+            clearTimeout(aiTimeout);
+
+            clickBtn.disabled = true;
+            startBtn.disabled = false;
+            startBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+
+            timerEl.innerText = '0.0s';
+            timerBar.style.width = '0%';
+
+            showResultModal();
+        }
+
+        // Rank Badge Calculation
+        function getRankBadge(cps) {
+            if (cps >= 9.0) return "閃電肉墊極速神 ⚡";
+            if (cps >= 7.0) return "無敵連點大暴走 🐱";
+            if (cps >= 5.5) return "連點快手小高手 🐾";
+            if (cps >= 4.0) return "可愛平手潛力股 🌸";
+            return "手殘救星萌萌鴨 🦆";
+        }
+
+        // Show Results Popup Card
+        function showResultModal() {
+            const diff = playerClicks - aiClicks;
+            const avgPlayerCps = (playerClicks / GAME_DURATION).toFixed(1);
+            const avgAiCps = (aiClicks / GAME_DURATION).toFixed(1);
+
+            finalPlayerClicks.innerText = `${playerClicks} 下`;
+            finalAiClicks.innerText = `${aiClicks} 下`;
+            finalPlayerCps.innerText = `${avgPlayerCps} CPS`;
+            finalAiCps.innerText = `${avgAiCps} CPS`;
+
+            rankBadge.innerText = getRankBadge(parseFloat(avgPlayerCps));
+
+            if (diff > 0) {
+                // Player Won
+                resultTitle.innerText = "🎉 喵喵大獲全勝！";
+                resultTitle.className = "text-2xl sm:text-3xl font-black text-pink-500 font-cute mb-1";
+                resultDiffText.innerText = `你贏了 汪汪 AI 總共 ${diff} 下！好厲害！`;
+                resultIconBox.innerText = "🐱";
+                resultIconBox.className = "w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-3 text-5xl bg-pink-100 border-4 border-pink-300 shadow-inner";
+
+                playVictorySound();
+                // Confetti fireworks
+                try {
+                    confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
+                } catch(e){}
+
+            } else if (diff < 0) {
+                // AI Won
+                const absDiff = Math.abs(diff);
+                resultTitle.innerText = "😭 只差一點點！";
+                resultTitle.className = "text-2xl sm:text-3xl font-black text-purple-500 font-cute mb-1";
+                resultDiffText.innerText = `汪汪 AI 險勝了 ${absDiff} 下，再試一次吧！`;
+                resultIconBox.innerText = "🐶";
+                resultIconBox.className = "w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-3 text-5xl bg-purple-100 border-4 border-purple-300 shadow-inner";
+            } else {
+                // Tie
+                resultTitle.innerText = "🤝 勢均力敵！平手！";
+                resultTitle.className = "text-2xl sm:text-3xl font-black text-amber-500 font-cute mb-1";
+                resultDiffText.innerText = `你們同時點擊了 ${playerClicks} 下！`;
+                resultIconBox.innerText = "🐾";
+                resultIconBox.className = "w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-3 text-5xl bg-amber-100 border-4 border-amber-300 shadow-inner";
+            }
+
+            // Show animation
+            resultModal.classList.remove('hidden');
+            setTimeout(() => {
+                resultModal.classList.remove('opacity-0');
+                modalCard.classList.remove('scale-90');
+                modalCard.classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeModalAndReset() {
+            resultModal.classList.add('opacity-0');
+            modalCard.classList.remove('scale-100');
+            modalCard.classList.add('scale-90');
+
+            setTimeout(() => {
+                resultModal.classList.add('hidden');
+
+                // Reset UI values
+                playerClicks = 0;
+                aiClicks = 0;
+                timeRemaining = GAME_DURATION;
+                
+                timerEl.innerText = `${GAME_DURATION.toFixed(1)}s`;
+                timerBar.style.width = '100%';
+                playerClicksText.innerText = '0';
+                aiClicksText.innerText = '0';
+                playerCpsEl.innerHTML = `0.0 <span class="text-xs font-bold">CPS</span>`;
+                aiCpsEl.innerHTML = `0.0 <span class="text-xs font-bold">CPS</span>`;
+
+                playerBar.style.width = '0%';
+                aiBar.style.width = '0%';
+                playerPercent.innerText = '0%';
+                aiPercent.innerText = '0%';
+
+                playerAvatar.style.left = '0%';
+                aiAvatar.style.left = '0%';
+            }, 300);
+        }
+    </script>
+</body>
+</html>
